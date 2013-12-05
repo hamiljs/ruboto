@@ -45,29 +45,17 @@ View.class_eval do
   end
 
   def configure(context, params = {})
-    if width = params.delete(:width)
-      getLayoutParams.width = View.convert_constant(width)
-    end
-
-    if height = params.delete(:height)
-      getLayoutParams.height = View.convert_constant(height)
-    end
     
-    if weight = params.delete(:weight)
-      getLayoutParams.weight = View.convert_constant(weight)
+    if layout = params.delete(:layout)
+      layout.each do |k, v|
+        getLayoutParams.send("#{k.to_s}=",View.convert_constant(v))
+      end
     end
 
     if margins = params.delete(:margins)
       getLayoutParams.set_margins(*margins)
     end
 
-    if layout = params.delete(:layout)
-      lp = getLayoutParams
-      layout.each do |k, v|
-        method_name = k.to_s.gsub(/_([a-z])/) { $1.upcase }
-        invoke_with_converted_arguments(lp, method_name, v)
-      end
-    end
 
     params.each do |k, v|
       method_name = "set#{k.to_s.gsub(/(^|_)([a-z])/) { $2.upcase }}"
